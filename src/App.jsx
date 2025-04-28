@@ -9,6 +9,7 @@ function App() {
   const [errorIndex, setErrorIndex] = useState(-1);
   const [timeLeft, setTimeLeft] = useState(5.0);
   const [successCount, setSuccessCount] = useState(0);
+  const [errorCount, setErrorCount] = useState(0);
   const [showTimeUp, setShowTimeUp] = useState(false);
 
   const generateNewWord = () => {
@@ -23,6 +24,7 @@ function App() {
 
   const resetGame = () => {
     setSuccessCount(0);
+    setErrorCount(0);
     generateNewWord();
   };
 
@@ -63,6 +65,7 @@ function App() {
     for (let i = 0; i < input.length; i++) {
       if (input[i] !== currentWord[i]) {
         setErrorIndex(i);
+        setErrorCount((prev) => prev + 1);
         return;
       }
     }
@@ -99,6 +102,16 @@ function App() {
   return (
     <div className="App">
       <h1>Entraînement à la dactylographie</h1>
+      <div className="score-display">
+        <div className="score-item score-success">
+          <span>✅ Succès :</span>
+          <span>{successCount}</span>
+        </div>
+        <div className="score-item score-error">
+          <span>❌ Erreurs :</span>
+          <span>{errorCount}</span>
+        </div>
+      </div>
       <div className={getTimerClassName()}>{timeLeft.toFixed(1)}s</div>
       {showTimeUp && (
         <div className="time-up-message">

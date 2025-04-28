@@ -100,3 +100,25 @@ button:hover:not(:disabled) {
 .retry-button:hover:not(:disabled) {
   background-color: #1976d2;
 }
+
+.score-display {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1rem 0;
+  font-size: 1.2rem;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-success {
+  color: #4caf50;
+}
+
+.score-error {
+  color: #f44336;
+}
