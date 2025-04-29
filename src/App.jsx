@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { generate } from "random-words";
 
 function App() {
@@ -12,8 +12,9 @@ function App() {
   const [errorCount, setErrorCount] = useState(0);
   const [showTimeUp, setShowTimeUp] = useState(false);
   const inputRef = useRef(null);
+  const timerRef = useRef(null);
 
-  const generateNewWord = () => {
+  const generateNewWord = useCallback(() => {
     const word = generate();
     setCurrentWord(word);
     setUserInput("");
@@ -21,25 +22,24 @@ function App() {
     const newTime = Math.max(1.0, 5.0 - successCount * 0.1);
     setTimeLeft(newTime);
     setShowTimeUp(false);
-  };
+  }, [successCount]);
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setSuccessCount(0);
     setErrorCount(0);
     generateNewWord();
     setTimeout(() => {
       inputRef.current?.focus();
-    }, 100);
-  };
+    }, 0);
+  }, [generateNewWord]);
 
   useEffect(() => {
     generateNewWord();
-  }, []);
+  }, [generateNewWord]);
 
   useEffect(() => {
-    let timer;
     if (isPracticeActive && timeLeft > 0) {
-      timer = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           const newTime = prevTime - 0.1;
           if (newTime <= 0) {
@@ -50,43 +50,52 @@ function App() {
         });
       }, 100);
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [isPracticeActive, timeLeft]);
 
-  const handleStartPractice = () => {
+  const handleStartPractice = useCallback(() => {
     setIsPracticeActive(true);
     setShowTimeUp(false);
     generateNewWord();
     setTimeout(() => {
       inputRef.current?.focus();
-    }, 100);
-  };
+    }, 0);
+  }, [generateNewWord]);
 
-  const handleInputChange = (e) => {
-    if (!isPracticeActive) return;
+  const handleInputChange = useCallback(
+    (e) => {
+      if (!isPracticeActive) return;
 
-    const input = e.target.value;
-    setUserInput(input);
+      const input = e.target.value;
+      setUserInput(input);
 
-    for (let i = 0; i < input.length; i++) {
-      if (input[i] !== currentWord[i]) {
-        setErrorIndex(i);
-        setErrorCount((prev) => prev + 1);
-        return;
+      // Vérification optimisée
+      let hasError = false;
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] !== currentWord[i]) {
+          setErrorIndex(i);
+          setErrorCount((prev) => prev + 1);
+          hasError = true;
+          break;
+        }
       }
-    }
 
-    setErrorIndex(-1);
+      if (!hasError) {
+        setErrorIndex(-1);
+        if (input.length === currentWord.length) {
+          setSuccessCount((prev) => prev + 1);
+          setTimeout(generateNewWord, 0);
+        }
+      }
+    },
+    [isPracticeActive, currentWord, generateNewWord]
+  );
 
-    if (input.length === currentWord.length) {
-      setSuccessCount((prev) => prev + 1);
-      setTimeout(() => {
-        generateNewWord();
-      }, 500);
-    }
-  };
-
-  const renderWord = () => {
+  const renderWord = useCallback(() => {
     return currentWord.split("").map((letter, index) => {
       const isIncorrect = index === errorIndex;
       return (
@@ -95,13 +104,13 @@ function App() {
         </span>
       );
     });
-  };
+  }, [currentWord, errorIndex]);
 
-  const getTimerClassName = () => {
+  const getTimerClassName = useCallback(() => {
     if (timeLeft <= 1.0) return "timer danger";
     if (timeLeft <= 2.0) return "timer warning";
     return "timer";
-  };
+  }, [timeLeft]);
 
   return (
     <div className="App">
