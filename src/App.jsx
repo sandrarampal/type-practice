@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { generate } from "random-words";
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
   const [successCount, setSuccessCount] = useState(0);
   const [errorCount, setErrorCount] = useState(0);
   const [showTimeUp, setShowTimeUp] = useState(false);
+  const inputRef = useRef(null);
 
   const generateNewWord = () => {
     const word = generate();
@@ -26,6 +27,9 @@ function App() {
     setSuccessCount(0);
     setErrorCount(0);
     generateNewWord();
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   useEffect(() => {
@@ -53,6 +57,9 @@ function App() {
     setIsPracticeActive(true);
     setShowTimeUp(false);
     generateNewWord();
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   const handleInputChange = (e) => {
@@ -61,7 +68,6 @@ function App() {
     const input = e.target.value;
     setUserInput(input);
 
-    // Vérifier chaque caractère
     for (let i = 0; i < input.length; i++) {
       if (input[i] !== currentWord[i]) {
         setErrorIndex(i);
@@ -70,10 +76,8 @@ function App() {
       }
     }
 
-    // Si on arrive ici, c'est que tout est correct
     setErrorIndex(-1);
 
-    // Si le mot est complet et correct
     if (input.length === currentWord.length) {
       setSuccessCount((prev) => prev + 1);
       setTimeout(() => {
@@ -101,44 +105,43 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Entraînement à la dactylographie</h1>
+      <h1>Typing Practice</h1>
       <div className="score-display">
         <div className="score-item score-success">
-          <span>✅ Succès :</span>
+          <span>✅ Success :</span>
           <span>{successCount}</span>
         </div>
         <div className="score-item score-error">
-          <span>❌ Erreurs :</span>
+          <span>❌ Errors :</span>
           <span>{errorCount}</span>
         </div>
       </div>
       <div className={getTimerClassName()}>{timeLeft.toFixed(1)}s</div>
       {showTimeUp && (
         <div className="time-up-message">
-          Temps écoulé !
+          Time's up!
           <button className="retry-button" onClick={resetGame}>
-            Réessayer
+            Try Again
           </button>
         </div>
       )}
       <div className="word-display">
-        <h2>Mot à taper : {renderWord()}</h2>
+        <h2>Word to type : {renderWord()}</h2>
       </div>
       <div className="input-area">
         <input
+          ref={inputRef}
           type="text"
           value={userInput}
           onChange={handleInputChange}
           disabled={!isPracticeActive || timeLeft === 0}
           placeholder={
-            isPracticeActive
-              ? "Tapez le mot ici..."
-              : "Cliquez sur Démarrer pour commencer"
+            isPracticeActive ? "Type the word here..." : "Click Start to begin"
           }
         />
       </div>
       <button onClick={handleStartPractice} disabled={isPracticeActive}>
-        Démarrer l'entraînement
+        Start Practice
       </button>
     </div>
   );
