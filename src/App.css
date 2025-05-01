@@ -2,11 +2,12 @@
   box-sizing: border-box;
 }
 
-.App {
+body {
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
+  font-family: "Roboto", sans-serif;
 }
 
 .word-display {
@@ -14,6 +15,11 @@
   padding: 1rem;
   background-color: #f5f5f5;
   border-radius: 8px;
+}
+
+.word-display h2 {
+  font-size: 2rem;
+  margin: 0;
 }
 
 .input-area {
@@ -105,7 +111,7 @@ button:hover:not(:disabled) {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin: 1rem 0;
+  margin: 2rem 0;
   font-size: 1.2rem;
 }
 
@@ -121,4 +127,12 @@ button:hover:not(:disabled) {
 
 .score-error {
   color: #f44336;
+}
+
+.app-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #333;
+  text-align: center;
 }

@@ -1,6 +1,12 @@
 import "./App.css";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { generate } from "random-words";
+import ScoreDisplay from "./components/ScoreDisplay";
+import Timer from "./components/Timer";
+import WordDisplay from "./components/WordDisplay";
+import InputArea from "./components/InputArea";
+import TimeUpMessage from "./components/TimeUpMessage";
+import Title from "./components/Title";
 
 function App() {
   const [currentWord, setCurrentWord] = useState("");
@@ -73,7 +79,6 @@ function App() {
       const input = e.target.value;
       setUserInput(input);
 
-      // Vérification optimisée
       let hasError = false;
       for (let i = 0; i < input.length; i++) {
         if (input[i] !== currentWord[i]) {
@@ -95,60 +100,20 @@ function App() {
     [isPracticeActive, currentWord, generateNewWord]
   );
 
-  const renderWord = useCallback(() => {
-    return currentWord.split("").map((letter, index) => {
-      const isIncorrect = index === errorIndex;
-      return (
-        <span key={index} className={isIncorrect ? "incorrect" : ""}>
-          {letter}
-        </span>
-      );
-    });
-  }, [currentWord, errorIndex]);
-
-  const getTimerClassName = useCallback(() => {
-    if (timeLeft <= 1.0) return "timer danger";
-    if (timeLeft <= 2.0) return "timer warning";
-    return "timer";
-  }, [timeLeft]);
-
   return (
     <div className="App">
-      <h1>Typing Practice</h1>
-      <div className="score-display">
-        <div className="score-item score-success">
-          <span>✅ Success :</span>
-          <span>{successCount}</span>
-        </div>
-        <div className="score-item score-error">
-          <span>❌ Errors :</span>
-          <span>{errorCount}</span>
-        </div>
-      </div>
-      <div className={getTimerClassName()}>{timeLeft.toFixed(1)}s</div>
-      {showTimeUp && (
-        <div className="time-up-message">
-          Time's up!
-          <button className="retry-button" onClick={resetGame}>
-            Try Again
-          </button>
-        </div>
-      )}
-      <div className="word-display">
-        <h2>Word to type : {renderWord()}</h2>
-      </div>
-      <div className="input-area">
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          disabled={!isPracticeActive || timeLeft === 0}
-          placeholder={
-            isPracticeActive ? "Type the word here..." : "Click Start to begin"
-          }
-        />
-      </div>
+      <Title />
+      <ScoreDisplay successCount={successCount} errorCount={errorCount} />
+      <Timer timeLeft={timeLeft} />
+      <WordDisplay currentWord={currentWord} errorIndex={errorIndex} />
+      <InputArea
+        userInput={userInput}
+        handleInputChange={handleInputChange}
+        isPracticeActive={isPracticeActive}
+        timeLeft={timeLeft}
+        inputRef={inputRef}
+      />
+      {showTimeUp && <TimeUpMessage resetGame={resetGame} />}
       <button onClick={handleStartPractice} disabled={isPracticeActive}>
         Start Practice
       </button>
