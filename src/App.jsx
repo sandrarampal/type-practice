@@ -17,6 +17,10 @@ function App() {
   const [successCount, setSuccessCount] = useState(0);
   const [errorCount, setErrorCount] = useState(0);
   const [showTimeUp, setShowTimeUp] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    const savedScore = localStorage.getItem("bestScore");
+    return savedScore ? parseInt(savedScore) : 0;
+  });
   const inputRef = useRef(null);
   const timerRef = useRef(null);
 
@@ -31,13 +35,17 @@ function App() {
   }, [successCount]);
 
   const resetGame = useCallback(() => {
+    if (successCount > bestScore) {
+      setBestScore(successCount);
+      localStorage.setItem("bestScore", successCount.toString());
+    }
     setSuccessCount(0);
     setErrorCount(0);
     generateNewWord();
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  }, [generateNewWord]);
+  }, [generateNewWord, successCount, bestScore]);
 
   useEffect(() => {
     generateNewWord();
@@ -103,7 +111,11 @@ function App() {
   return (
     <div className="App">
       <Title />
-      <ScoreDisplay successCount={successCount} errorCount={errorCount} />
+      <ScoreDisplay
+        successCount={successCount}
+        errorCount={errorCount}
+        bestScore={bestScore}
+      />
       <Timer timeLeft={timeLeft} />
       <WordDisplay currentWord={currentWord} errorIndex={errorIndex} />
       <InputArea

@@ -13,8 +13,11 @@ const WordDisplay = ({ currentWord, errorIndex }) => {
   };
 
   return (
-    <div className="word-display">
-      <h2>Word to type : {renderWord()}</h2>
+    <div className="word-display-container">
+      <span className="word-display-title">Word to type :</span>
+      <div className="word-display">
+        <h2>{renderWord()}</h2>
+      </div>
     </div>
   );
 };
